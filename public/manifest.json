@@ -1,0 +1,21 @@
+{
+    "name": "Real Estate Daily",
+    "short_name": "RE Daily",
+    "description": "매일 자정 하나의 부동산 관련 콘텐츠를 24시간 한정으로 제공하는 휘발성 지식 구독 서비스",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}
