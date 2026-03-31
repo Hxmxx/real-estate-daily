@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import type { DailyContent } from '@/types'
-import GlassCard from './GlassCard'
 
 interface ContentViewProps {
   content: DailyContent | null
@@ -13,18 +12,18 @@ function MarkdownContent({ text }: { text: string }) {
   const lines = text.split('\n')
 
   return (
-    <div className="prose-mattari">
+    <div>
       {lines.map((line, i) => {
         if (line.startsWith('## ')) {
           return (
-            <h2 key={i} className="mt-8 mb-3 text-base font-semibold text-white/90 tracking-tight">
+            <h2 key={i} className="mt-8 mb-3 text-base font-semibold text-gray-900 tracking-tight">
               {line.slice(3)}
             </h2>
           )
         }
         if (line.startsWith('### ')) {
           return (
-            <h3 key={i} className="mt-6 mb-2 text-sm font-semibold text-white/70 uppercase tracking-widest">
+            <h3 key={i} className="mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-widest">
               {line.slice(4)}
             </h3>
           )
@@ -33,7 +32,7 @@ function MarkdownContent({ text }: { text: string }) {
           return (
             <blockquote
               key={i}
-              className="my-4 border-l-2 border-indigo-500/60 pl-4 italic text-white/60 text-sm leading-relaxed"
+              className="my-4 border-l-2 border-gray-200 pl-4 italic text-gray-500 text-sm leading-relaxed"
             >
               {line.slice(2)}
             </blockquote>
@@ -41,7 +40,7 @@ function MarkdownContent({ text }: { text: string }) {
         }
         if (line.startsWith('- ')) {
           return (
-            <li key={i} className="ml-4 text-sm text-white/60 leading-relaxed list-disc marker:text-indigo-500/60">
+            <li key={i} className="ml-4 text-sm text-gray-600 leading-7 list-disc marker:text-gray-300">
               {renderInline(line.slice(2))}
             </li>
           )
@@ -49,19 +48,19 @@ function MarkdownContent({ text }: { text: string }) {
         if (/^\d+\. /.test(line)) {
           const content = line.replace(/^\d+\. /, '')
           return (
-            <li key={i} className="ml-4 text-sm text-white/60 leading-relaxed list-decimal marker:text-indigo-500/60">
+            <li key={i} className="ml-4 text-sm text-gray-600 leading-7 list-decimal marker:text-gray-400">
               {renderInline(content)}
             </li>
           )
         }
         if (line === '---') {
-          return <hr key={i} className="my-6 border-white/8" />
+          return <hr key={i} className="my-6 border-gray-100" />
         }
         if (line.trim() === '') {
           return <div key={i} className="h-3" />
         }
         return (
-          <p key={i} className="text-sm text-white/60 leading-7">
+          <p key={i} className="text-sm text-gray-600 leading-7">
             {renderInline(line)}
           </p>
         )
@@ -75,7 +74,7 @@ function renderInline(text: string): React.ReactNode {
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
-        <strong key={i} className="font-semibold text-white/85">
+        <strong key={i} className="font-semibold text-gray-900">
           {part.slice(2, -2)}
         </strong>
       )
@@ -87,22 +86,22 @@ function renderInline(text: string): React.ReactNode {
 export default function ContentView({ content, loading }: ContentViewProps) {
   if (loading) {
     return (
-      <GlassCard className="p-8">
-        <div className="space-y-4 animate-pulse">
-          <div className="h-5 w-2/3 rounded bg-white/6" />
-          <div className="h-3 w-full rounded bg-white/4" />
-          <div className="h-3 w-5/6 rounded bg-white/4" />
-          <div className="h-3 w-4/5 rounded bg-white/4" />
-        </div>
-      </GlassCard>
+      <div className="pt-6 space-y-4 animate-pulse">
+        <div className="h-6 w-3/4 rounded bg-gray-100" />
+        <div className="h-4 w-full rounded bg-gray-50" />
+        <div className="h-4 w-5/6 rounded bg-gray-50" />
+        <div className="h-4 w-4/5 rounded bg-gray-50" />
+        <div className="h-4 w-full rounded bg-gray-50" />
+        <div className="h-4 w-2/3 rounded bg-gray-50" />
+      </div>
     )
   }
 
   if (!content) {
     return (
-      <GlassCard className="p-8 text-center">
-        <p className="text-sm text-white/30">오늘의 콘텐츠를 준비 중입니다.</p>
-      </GlassCard>
+      <div className="pt-8 text-sm text-gray-400">
+        오늘의 콘텐츠를 준비 중입니다.
+      </div>
     )
   }
 
@@ -110,43 +109,40 @@ export default function ContentView({ content, loading }: ContentViewProps) {
     <AnimatePresence mode="wait">
       <motion.div
         key={content.id}
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       >
-        <GlassCard className="p-8">
-          <div className="mb-6 space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-indigo-400/80 font-medium tracking-wide uppercase">
-                {content.reading_time}분 읽기
-              </span>
-            </div>
-            <h1 className="text-xl font-semibold text-white leading-snug tracking-tight">
-              {content.title}
-            </h1>
-            <p className="text-sm text-white/45 leading-relaxed">
-              {content.subtitle}
-            </p>
-          </div>
+        <div className="pt-4 pb-6">
+          <span className="text-xs text-gray-400 font-medium">
+            {content.reading_time}분 읽기
+          </span>
+        </div>
 
-          <div className="border-t border-white/6 pt-6">
-            <MarkdownContent text={content.content} />
-          </div>
+        <h1 className="text-xl font-semibold text-gray-900 leading-snug tracking-tight mb-3">
+          {content.title}
+        </h1>
+        <p className="text-sm text-gray-500 leading-relaxed mb-8">
+          {content.subtitle}
+        </p>
 
-          {content.source_url && (
-            <div className="mt-8 pt-6 border-t border-white/6">
-              <a
-                href={content.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-white/25 hover:text-white/50 transition-colors"
-              >
-                원문 보기 →
-              </a>
-            </div>
-          )}
-        </GlassCard>
+        <div className="border-t border-gray-100 pt-6">
+          <MarkdownContent text={content.content} />
+        </div>
+
+        {content.source_url && (
+          <div className="mt-10 pt-6 border-t border-gray-100">
+            <a
+              href={content.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              원문 보기 →
+            </a>
+          </div>
+        )}
       </motion.div>
     </AnimatePresence>
   )

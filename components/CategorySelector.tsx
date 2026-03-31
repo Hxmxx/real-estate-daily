@@ -15,30 +15,23 @@ export default function CategorySelector({
   onChange,
 }: CategorySelectorProps) {
   return (
-    <div className="flex flex-wrap gap-2 justify-center">
+    <div className="grid grid-cols-2 gap-2">
       {categories.map((cat) => {
         const isSelected = cat.slug === selected
         return (
           <motion.button
             key={cat.slug}
             onClick={() => onChange(cat.slug)}
-            whileTap={{ scale: 0.94 }}
+            whileTap={{ scale: 0.97 }}
             className={[
-              'relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-200',
+              'flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-left',
               isSelected
-                ? 'text-white'
-                : 'text-white/40 hover:text-white/70',
+                ? 'border-gray-900 bg-gray-900 text-white'
+                : 'border-gray-200 text-gray-700 hover:border-gray-400',
             ].join(' ')}
           >
-            {isSelected && (
-              <motion.span
-                layoutId="category-pill"
-                className="absolute inset-0 rounded-full bg-indigo-500/20 border border-indigo-500/40"
-                transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-              />
-            )}
-            <span className="relative">{cat.icon}</span>
-            <span className="relative">{cat.name}</span>
+            <span className="text-base">{cat.icon}</span>
+            <span>{cat.name}</span>
           </motion.button>
         )
       })}

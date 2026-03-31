@@ -1,16 +1,15 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import Link from 'next/link'
 import type { Category, DailyContent } from '@/types'
 import CountdownTimer from './CountdownTimer'
-import CategorySelector from './CategorySelector'
 import ContentView from './ContentView'
 import SubscribeForm from './SubscribeForm'
-import GlassCard from './GlassCard'
-import ParticleBackground from './ParticleBackground'
+import OnboardingView from './OnboardingView'
 
-const STORAGE_KEY = 'mattari-category'
+const STORAGE_CATEGORY = 'mattari-category'
+const STORAGE_ONBOARDED = 'mattari-onboarded'
 
 interface MainShellProps {
   categories: Category[]
@@ -23,6 +22,7 @@ export default function MainShell({
   initialContent,
   initialCategory,
 }: MainShellProps) {
+  const [onboarded, setOnboarded] = useState<boolean | null>(null)
   const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [content, setContent] = useState<DailyContent | null>(initialContent)
   const [loading, setLoading] = useState(false)
@@ -42,85 +42,75 @@ export default function MainShell({
     }
   }, [])
 
-  function handleCategoryChange(slug: string) {
-    if (slug === selectedCategory) return
-    setSelectedCategory(slug)
-    localStorage.setItem(STORAGE_KEY, slug)
-    fetchContent(slug)
-  }
-
-  // Restore saved category on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved && saved !== initialCategory && categories.some((c) => c.slug === saved)) {
-      setSelectedCategory(saved)
-      fetchContent(saved)
+    const isOnboarded = localStorage.getItem(STORAGE_ONBOARDED) === 'true'
+    const savedCategory = localStorage.getItem(STORAGE_CATEGORY)
+    setOnboarded(isOnboarded)
+    if (isOnboarded && savedCategory && savedCategory !== initialCategory && categories.some((c) => c.slug === savedCategory)) {
+      setSelectedCategory(savedCategory)
+      fetchContent(savedCategory)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  function completeOnboarding(slug: string) {
+    localStorage.setItem(STORAGE_ONBOARDED, 'true')
+    localStorage.setItem(STORAGE_CATEGORY, slug)
+    setSelectedCategory(slug)
+    setOnboarded(true)
+    fetchContent(slug)
+  }
+
+  // Hydrating
+  if (onboarded === null) return null
+
+  // First visit → onboarding
+  if (!onboarded) {
+    return <OnboardingView categories={categories} onComplete={completeOnboarding} />
+  }
+
+  const currentCategory = categories.find((c) => c.slug === selectedCategory)
+
   return (
-    <>
-      <ParticleBackground />
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-[480px] px-5">
 
-      <div className="relative z-10 min-h-screen px-4 py-16">
-        <div className="mx-auto max-w-[680px] space-y-8">
+        {/* Header */}
+        <header className="flex items-center justify-between py-5 border-b border-gray-100">
+          <h1 className="text-base font-semibold tracking-tight text-gray-900">
+            마타리
+          </h1>
+          <div className="flex items-center gap-4">
+            <CountdownTimer />
+            <Link
+              href="/settings"
+              className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              설정
+            </Link>
+          </div>
+        </header>
 
-          {/* Header */}
-          <motion.header
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center justify-between"
-          >
-            <div>
-              <h1 className="text-lg font-semibold text-white tracking-tight">
-                마타리
-              </h1>
-              <p className="text-xs text-white/30 mt-0.5">
-                매일 자정 갱신되는 지식
-              </p>
-            </div>
-            <GlassCard className="px-4 py-3">
-              <CountdownTimer />
-            </GlassCard>
-          </motion.header>
+        {/* Category label */}
+        {currentCategory && (
+          <div className="pt-8 pb-2">
+            <span className="text-xs text-gray-400 font-medium uppercase tracking-widest">
+              {currentCategory.icon} {currentCategory.name}
+            </span>
+          </div>
+        )}
 
-          {/* Category Selector */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <CategorySelector
-              categories={categories}
-              selected={selectedCategory}
-              onChange={handleCategoryChange}
-            />
-          </motion.div>
-
-          {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <ContentView content={content} loading={loading} />
-          </motion.div>
-
-          {/* Subscribe */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <GlassCard className="px-6 py-5">
-              <SubscribeForm />
-            </GlassCard>
-          </motion.div>
-
+        {/* Content */}
+        <div className="pb-16">
+          <ContentView content={content} loading={loading} />
         </div>
+
+        {/* Subscribe */}
+        <div className="border-t border-gray-100 py-8">
+          <SubscribeForm />
+        </div>
+
       </div>
-    </>
+    </div>
   )
 }
