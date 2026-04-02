@@ -16,7 +16,7 @@ function MarkdownContent({ text }: { text: string }) {
       {lines.map((line, i) => {
         if (line.startsWith('## ')) {
           return (
-            <h2 key={i} className="mt-8 mb-3 text-base font-semibold text-gray-900 tracking-tight">
+            <h2 key={i} className="mt-8 mb-3 text-base font-semibold text-gray-900 tracking-tight sm:text-lg sm:mt-10">
               {line.slice(3)}
             </h2>
           )
@@ -32,7 +32,7 @@ function MarkdownContent({ text }: { text: string }) {
           return (
             <blockquote
               key={i}
-              className="my-4 border-l-2 border-gray-200 pl-4 italic text-gray-500 text-sm leading-relaxed"
+              className="my-4 border-l-2 border-gray-200 pl-4 italic text-gray-500 text-sm leading-relaxed sm:text-base sm:my-6"
             >
               {line.slice(2)}
             </blockquote>
@@ -40,7 +40,7 @@ function MarkdownContent({ text }: { text: string }) {
         }
         if (line.startsWith('- ')) {
           return (
-            <li key={i} className="ml-4 text-sm text-gray-600 leading-7 list-disc marker:text-gray-300">
+            <li key={i} className="ml-4 text-sm text-gray-600 leading-7 list-disc marker:text-gray-300 sm:text-base sm:leading-8">
               {renderInline(line.slice(2))}
             </li>
           )
@@ -48,19 +48,19 @@ function MarkdownContent({ text }: { text: string }) {
         if (/^\d+\. /.test(line)) {
           const content = line.replace(/^\d+\. /, '')
           return (
-            <li key={i} className="ml-4 text-sm text-gray-600 leading-7 list-decimal marker:text-gray-400">
+            <li key={i} className="ml-4 text-sm text-gray-600 leading-7 list-decimal marker:text-gray-400 sm:text-base sm:leading-8">
               {renderInline(content)}
             </li>
           )
         }
         if (line === '---') {
-          return <hr key={i} className="my-6 border-gray-100" />
+          return <hr key={i} className="my-6 border-gray-100 sm:my-8" />
         }
         if (line.trim() === '') {
-          return <div key={i} className="h-3" />
+          return <div key={i} className="h-3 sm:h-4" />
         }
         return (
-          <p key={i} className="text-sm text-gray-600 leading-7">
+          <p key={i} className="text-sm text-gray-600 leading-7 sm:text-base sm:leading-8">
             {renderInline(line)}
           </p>
         )
@@ -120,10 +120,10 @@ export default function ContentView({ content, loading }: ContentViewProps) {
           </span>
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-900 leading-snug tracking-tight mb-3">
+        <h1 className="text-xl font-semibold text-gray-900 leading-snug tracking-tight mb-3 sm:text-2xl sm:leading-tight sm:mb-4">
           {content.title}
         </h1>
-        <p className="text-sm text-gray-500 leading-relaxed mb-8">
+        <p className="text-sm text-gray-500 leading-relaxed mb-8 sm:text-base sm:mb-10">
           {content.subtitle}
         </p>
 

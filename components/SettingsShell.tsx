@@ -44,7 +44,7 @@ export default function SettingsShell({ categories }: SettingsShellProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[480px] px-5">
+      <div className="mx-auto w-full max-w-[480px] px-5 sm:max-w-2xl sm:px-10 lg:max-w-3xl lg:px-16">
 
         <header className="flex items-center gap-3 py-5 border-b border-gray-100">
           <Link

@@ -12,8 +12,8 @@ export default function OnboardingView({ categories, onComplete }: OnboardingVie
   const [selected, setSelected] = useState<string | null>(null)
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center px-6">
-      <div className="w-full max-w-sm mx-auto">
+    <div className="min-h-screen bg-white flex flex-col justify-center px-6 sm:px-10">
+      <div className="w-full max-w-sm mx-auto sm:max-w-lg">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-1">
           마타리
         </h1>
@@ -25,7 +25,7 @@ export default function OnboardingView({ categories, onComplete }: OnboardingVie
           어떤 주제를 읽고 싶나요?
         </p>
 
-        <div className="grid grid-cols-2 gap-2 mb-8">
+        <div className="grid grid-cols-2 gap-2 mb-8 sm:grid-cols-4">
           {categories.map((cat) => (
             <button
               key={cat.slug}

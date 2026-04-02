@@ -61,6 +61,12 @@ export default function MainShell({
     fetchContent(slug)
   }
 
+  function handleCategoryChange(slug: string) {
+    localStorage.setItem(STORAGE_CATEGORY, slug)
+    setSelectedCategory(slug)
+    fetchContent(slug)
+  }
+
   // Hydrating
   if (onboarded === null) return null
 
@@ -73,10 +79,10 @@ export default function MainShell({
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[480px] px-5">
+      <div className="mx-auto w-full max-w-[480px] px-5 sm:max-w-2xl sm:px-10 lg:max-w-3xl lg:px-16">
 
         {/* Header */}
-        <header className="flex items-center justify-between py-5 border-b border-gray-100">
+        <header className="flex items-center justify-between py-5 border-b border-gray-100 sm:py-6">
           <h1 className="text-base font-semibold tracking-tight text-gray-900">
             마타리
           </h1>
@@ -90,6 +96,25 @@ export default function MainShell({
             </Link>
           </div>
         </header>
+
+        {/* Category tab bar — desktop only */}
+        <nav className="hidden sm:flex items-center gap-1 pt-5 pb-1 border-b border-gray-100 overflow-x-auto">
+          {categories.map((cat) => (
+            <button
+              key={cat.slug}
+              onClick={() => handleCategoryChange(cat.slug)}
+              className={[
+                'shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                cat.slug === selectedCategory
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50',
+              ].join(' ')}
+            >
+              <span>{cat.icon}</span>
+              <span>{cat.name}</span>
+            </button>
+          ))}
+        </nav>
 
         {/* Category label */}
         {currentCategory && (
@@ -106,7 +131,7 @@ export default function MainShell({
         </div>
 
         {/* Subscribe */}
-        <div className="border-t border-gray-100 py-8">
+        <div className="border-t border-gray-100 py-8 sm:py-10">
           <SubscribeForm />
         </div>
 

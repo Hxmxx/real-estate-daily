@@ -15,7 +15,7 @@ export default function CategorySelector({
   onChange,
 }: CategorySelectorProps) {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {categories.map((cat) => {
         const isSelected = cat.slug === selected
         return (
