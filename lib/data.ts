@@ -1,6 +1,16 @@
+import { createClient } from '@supabase/supabase-js'
 import type { Category, DailyContent } from '@/types'
 import { CATEGORIES, SEED_CONTENTS } from './seed-data'
 import { supabase, isSupabaseConfigured } from './supabase'
+
+// 쓰기 전용 서비스 롤 클라이언트 (RLS 우회, 서버 전용)
+const adminClient =
+  isSupabaseConfigured && process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY,
+      )
+    : null
 
 export async function getCategories(): Promise<Category[]> {
   if (isSupabaseConfigured && supabase) {
@@ -38,10 +48,10 @@ export async function saveSubscriber(
   email: string,
   preferredCategory?: string
 ): Promise<{ success: boolean; error?: string }> {
-  if (isSupabaseConfigured && supabase) {
+  if (isSupabaseConfigured && adminClient) {
     let categoryId: string | null = null
     if (preferredCategory) {
-      const { data } = await supabase
+      const { data } = await adminClient
         .from('categories')
         .select('id')
         .eq('slug', preferredCategory)
@@ -49,7 +59,7 @@ export async function saveSubscriber(
       categoryId = data?.id ?? null
     }
 
-    const { error } = await supabase.from('subscribers').upsert(
+    const { error } = await adminClient.from('subscribers').upsert(
       { email, preferred_category: categoryId, active: true },
       { onConflict: 'email' }
     )
