@@ -1,7 +1,17 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { createClient } from '@supabase/supabase-js'
 import type { Category, DailyContent } from '@/types'
 import { CATEGORIES } from './seed-data'
-import { supabase, isSupabaseConfigured } from './supabase'
+import { isSupabaseConfigured } from './supabase'
+
+// 스크랩용 서비스 롤 클라이언트 (RLS 우회, 서버 전용)
+const supabase =
+  isSupabaseConfigured && process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY,
+      )
+    : null
 
 // ---------------------------------------------------------------------------
 // RSS 소스 정의
@@ -158,11 +168,11 @@ async function callGemini(prompt: string): Promise<GeminiResult> {
 
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.7,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 8192,
     },
   })
 
@@ -207,11 +217,20 @@ async function scrapeCategory(category: Category): Promise<DailyContent> {
 
   // Supabase에 저장
   if (isSupabaseConfigured && supabase) {
+    // slug로 실제 UUID 조회 (시드 데이터의 가짜 ID 대신)
+    const { data: cat } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', category.slug)
+      .single()
+
+    const categoryId = cat?.id ?? category.id
+
     const { error } = await supabase
       .from('daily_contents')
       .upsert(
         {
-          category_id: category.id,
+          category_id: categoryId,
           publish_date: today,
           title: content.title,
           subtitle: content.subtitle,
